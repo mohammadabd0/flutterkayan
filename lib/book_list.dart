@@ -25,9 +25,6 @@ class _MyBookState extends State<MyBook> {
     'assets/images/pngimg.png',
   ];
   bool isSearchVisible = false;
-
-  //List<Book> filteredBookList = [];
-
   late List<Book> booklist = [
    
   ];
@@ -64,19 +61,7 @@ class _MyBookState extends State<MyBook> {
     String jsonbook = jsonEncode(booklist);
     preferences.setString("book", jsonbook);
   }
-/*
-  void updateList(String value) {
-    setState(() {
-      if (value.isEmpty) {
-        filteredBookList = booklist;
-      } else {
-        filteredBookList = booklist
-            .where((element) =>
-                element.getnameBook.toLowerCase().contains(value.toLowerCase()))
-            .toList();
-      }
-    });
-  }*/
+
 
   @override
   Widget build(BuildContext context) {
@@ -91,35 +76,6 @@ class _MyBookState extends State<MyBook> {
         style: TextStyle(color: Colors.white),
       ),
       actions: [
-        /*Padding(
-          padding: const EdgeInsets.all(5),
-          child: isSearchVisible
-              ? Container(
-                  width: 200,
-                  height: 40,
-                  padding: EdgeInsets.all(5),
-                  child: TextField(
-                    decoration: InputDecoration(
-                      filled: false,
-                      fillColor: Colors.white,
-                      hintText: 'Search Books',
-                      prefixIcon: Icon(Icons.search, color: Colors.white),
-                    ),
-                    onChanged: (value) => updateList(value),
-                  ),
-                )
-              : IconButton(
-                  icon: Icon(
-                    Icons.search,
-                    color: Colors.white,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      isSearchVisible = true;
-                    });
-                  },
-                ),
-        ),*/
         PopupMenuButton<SortOption>(
           icon: Icon(Icons.sort, color: Colors.white),
           onSelected: (value) {
