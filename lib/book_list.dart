@@ -121,7 +121,6 @@ class _MyBookState extends State<MyBook> {
             itemCount: booklist.length,
             itemBuilder: (context, index) {
               Book book = booklist[index];
-              var randomIndex = Random().nextInt(bookImages.length);
               return 
               
               Column(
@@ -137,7 +136,7 @@ class _MyBookState extends State<MyBook> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Image.asset(
-                            bookImages[randomIndex],
+                            book.getimage,
                             width: 80,
                           ),
                           Expanded(
@@ -165,8 +164,10 @@ class _MyBookState extends State<MyBook> {
             color: Colors.black,
           ),
           onPressed: () async {
+                var randomImageIndex = Random().nextInt(bookImages.length);
+
             Book newbook =
-                Book(author: "", dateTime: DateTime.now(), nameBook: "");
+                Book(author: "", dateTime: DateTime.now(), nameBook: "",image: bookImages[randomImageIndex] );
             var result = await Navigator.push(
               context,
               MaterialPageRoute(

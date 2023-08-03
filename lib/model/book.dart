@@ -2,11 +2,17 @@ class Book {
   String? _nameBook;
   String? _author;
   DateTime? _dateTime;
+  String? _image;
 
-  Book({String author = "", String nameBook = "", DateTime? dateTime}) {
+  Book(
+      {String author = "",
+      String nameBook = "",
+      DateTime? dateTime,
+      String image = ""}) {
     _author = author;
     _nameBook = nameBook;
     _dateTime = dateTime!;
+    _image = image;
   }
 
   String get getnameBook {
@@ -19,6 +25,10 @@ class Book {
 
   String get getauthor {
     return _author!;
+  }
+
+  String get getimage {
+    return _image!;
   }
 
   set setauthor(String newAuthor) {
@@ -38,6 +48,7 @@ class Book {
       "bookName": _nameBook,
       "author": _author,
       "dateTime": _dateTime?.toIso8601String(),
+      "image":_image
     };
   }
 
@@ -46,6 +57,7 @@ class Book {
       nameBook: json["bookName"],
       author: json["author"],
       dateTime: DateTime.parse(json["dateTime"]),
+      image: json["image"],
     );
   }
 }
