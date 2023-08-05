@@ -8,7 +8,7 @@ import 'package:flutter_application_task1/addbook.dart';
 import 'package:flutter_application_task1/detail_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'model/book.dart';
-
+import 'package:flutter_application_task1/drawerPape.dart';
 enum SortOption { nameBook, nameAuthor, dateTime }
 
 class MyBook extends StatefulWidget {
@@ -25,9 +25,6 @@ class _MyBookState extends State<MyBook> {
     'assets/images/pngimg.png',
   ];
   bool isSearchVisible = false;
-
-  //List<Book> filteredBookList = [];
-
   late List<Book> booklist = [
    
   ];
@@ -64,19 +61,7 @@ class _MyBookState extends State<MyBook> {
     String jsonbook = jsonEncode(booklist);
     preferences.setString("book", jsonbook);
   }
-/*
-  void updateList(String value) {
-    setState(() {
-      if (value.isEmpty) {
-        filteredBookList = booklist;
-      } else {
-        filteredBookList = booklist
-            .where((element) =>
-                element.getnameBook.toLowerCase().contains(value.toLowerCase()))
-            .toList();
-      }
-    });
-  }*/
+
 
   @override
   Widget build(BuildContext context) {
@@ -85,41 +70,14 @@ class _MyBookState extends State<MyBook> {
 
   AppBar buildAppBar() {
     return AppBar(
+      
       backgroundColor: Theme.of(context).colorScheme.secondary,
       title: Text(
         "Book List",
         style: TextStyle(color: Colors.white),
       ),
+      
       actions: [
-        /*Padding(
-          padding: const EdgeInsets.all(5),
-          child: isSearchVisible
-              ? Container(
-                  width: 200,
-                  height: 40,
-                  padding: EdgeInsets.all(5),
-                  child: TextField(
-                    decoration: InputDecoration(
-                      filled: false,
-                      fillColor: Colors.white,
-                      hintText: 'Search Books',
-                      prefixIcon: Icon(Icons.search, color: Colors.white),
-                    ),
-                    onChanged: (value) => updateList(value),
-                  ),
-                )
-              : IconButton(
-                  icon: Icon(
-                    Icons.search,
-                    color: Colors.white,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      isSearchVisible = true;
-                    });
-                  },
-                ),
-        ),*/
         PopupMenuButton<SortOption>(
           icon: Icon(Icons.sort, color: Colors.white),
           onSelected: (value) {
@@ -144,6 +102,7 @@ class _MyBookState extends State<MyBook> {
           ],
         ),
       ],
+      
     );
   }
 
@@ -158,6 +117,7 @@ class _MyBookState extends State<MyBook> {
       },
       child: Scaffold(
         appBar: buildAppBar(),
+        drawer: MyDrawer() ,
         body: Padding(
           padding: const EdgeInsets.all(8.0),
           child: ListView.builder(
@@ -165,7 +125,6 @@ class _MyBookState extends State<MyBook> {
             itemCount: booklist.length,
             itemBuilder: (context, index) {
               Book book = booklist[index];
-              var randomIndex = Random().nextInt(bookImages.length);
               return 
               
               Column(
@@ -181,7 +140,7 @@ class _MyBookState extends State<MyBook> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Image.asset(
-                            bookImages[randomIndex],
+                            book.getimage,
                             width: 80,
                           ),
                           Expanded(
@@ -205,12 +164,14 @@ class _MyBookState extends State<MyBook> {
         ),
         floatingActionButton: FloatingActionButton(
           child: const Icon(
-            Icons.navigate_next,
+            Icons.add,
             color: Colors.black,
           ),
           onPressed: () async {
+                var randomImageIndex = Random().nextInt(bookImages.length);
+
             Book newbook =
-                Book(author: "", dateTime: DateTime.now(), nameBook: "");
+                Book(author: "", dateTime: DateTime.now(), nameBook: "",image: bookImages[randomImageIndex] );
             var result = await Navigator.push(
               context,
               MaterialPageRoute(

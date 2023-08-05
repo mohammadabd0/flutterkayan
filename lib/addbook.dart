@@ -59,8 +59,7 @@ class _AddBooksState extends State<AddBooks> {
                     decoration: const InputDecoration(
                       labelText: "set a name",
                       hintText: "set a name",
-                      icon: Icon(Icons.book),
-                    ),
+                      icon: Icon(Icons.book),),
                     controller: _nameController, // Use the TextEditingController
                     validator: (value) {
                       if (value == null || value.isEmpty) {
