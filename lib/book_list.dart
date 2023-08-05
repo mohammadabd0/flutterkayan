@@ -8,7 +8,7 @@ import 'package:flutter_application_task1/addbook.dart';
 import 'package:flutter_application_task1/detail_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'model/book.dart';
-
+import 'package:flutter_application_task1/drawerPape.dart';
 enum SortOption { nameBook, nameAuthor, dateTime }
 
 class MyBook extends StatefulWidget {
@@ -70,11 +70,13 @@ class _MyBookState extends State<MyBook> {
 
   AppBar buildAppBar() {
     return AppBar(
+      
       backgroundColor: Theme.of(context).colorScheme.secondary,
       title: Text(
         "Book List",
         style: TextStyle(color: Colors.white),
       ),
+      
       actions: [
         PopupMenuButton<SortOption>(
           icon: Icon(Icons.sort, color: Colors.white),
@@ -100,6 +102,7 @@ class _MyBookState extends State<MyBook> {
           ],
         ),
       ],
+      
     );
   }
 
@@ -114,6 +117,7 @@ class _MyBookState extends State<MyBook> {
       },
       child: Scaffold(
         appBar: buildAppBar(),
+        drawer: MyDrawer() ,
         body: Padding(
           padding: const EdgeInsets.all(8.0),
           child: ListView.builder(
@@ -160,7 +164,7 @@ class _MyBookState extends State<MyBook> {
         ),
         floatingActionButton: FloatingActionButton(
           child: const Icon(
-            Icons.navigate_next,
+            Icons.add,
             color: Colors.black,
           ),
           onPressed: () async {

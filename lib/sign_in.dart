@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_task1/book_list.dart';
 import 'package:flutter_application_task1/sign_up.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uuid/uuid.dart';
 import 'model/user.dart';
 
 class LoginPage extends StatefulWidget {
@@ -16,31 +17,32 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+    bool newuser =false;
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
+
   // Check if a user exists based on their username
-  bool doesUserExist(String username, List<User> userList,String password) {
-    return userList.any((user) => user.userName == username &&user.password ==password );
+  bool doesUserExist(String username, List<User> userList,) {
+    return userList.any((user) => user.userName == username );
   }
+
 
   // Sign user in method
   void signInUser() async {
      if (_formKey.currentState!.validate()) {
     String username = usernameController.text;
-        String password= passwordController.text;
-
-    if (doesUserExist(username, widget.userLists,password)) {
-      // Allow the user to sign in since they are signed up
+    if (doesUserExist(username, widget.userLists,)) {
+      
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
           builder: (context) => MyBook(),
         ),
       );
+
     } else {
-      // Show an error dialog since the user is not signed up
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -60,9 +62,10 @@ class _LoginPageState extends State<LoginPage> {
 
   void loadUser() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
-    String jsonbook = preferences.getString("user") ?? '[]';
-    print(jsonbook);
-    List<dynamic> userData = jsonDecode(jsonbook);
+    String jsonuser = preferences.getString("user") ?? '[]';
+    print(jsonuser);
+
+    List<dynamic> userData = jsonDecode(jsonuser);
     List<User> users = userData.map((e) => User.fromJson(e)).toList();
     setState(() {
       widget.userLists = users;
@@ -73,9 +76,7 @@ class _LoginPageState extends State<LoginPage> {
   void initState() {
     loadUser();
     super.initState();
-    print(
-        "userLists length: ${widget.userLists.length}"); // Check if userLists is not empty
-  }
+  } 
 
   @override
   Widget build(BuildContext context) {
@@ -185,7 +186,6 @@ class _LoginPageState extends State<LoginPage> {
 
               const SizedBox(height: 50),
 
-              // or continue with
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 25.0),
                 child: Row(

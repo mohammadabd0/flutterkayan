@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_task1/book_list.dart';
 import 'package:flutter_application_task1/sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uuid/uuid.dart';
 
 import 'model/user.dart';
 
@@ -16,7 +17,6 @@ class SignUpPage extends StatefulWidget {
 
 class _SignUpPageState extends State<SignUpPage> {
   List<User> userList = [];
-  late User newuser;
   bool isLoading = false;
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -53,14 +53,15 @@ class _SignUpPageState extends State<SignUpPage> {
         );
         return;
       }
+    String userId = Uuid().v4();
 
       // Create a new User object
-      User newUser = User(
-        userName: newUsername,
-        email: emailController.text,
-        password: passwordController.text,
-      );
-
+     User newUser = User(
+      userId: userId,
+      userName: newUsername,
+      email: emailController.text,
+      password: passwordController.text,
+    );
       // Add the new user to the user list
       setState(() {
         userList.add(newUser);
