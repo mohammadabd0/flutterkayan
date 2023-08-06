@@ -17,7 +17,7 @@ import 'model/user.dart';
 enum SortOption { nameBook, nameAuthor, dateTime }
 
 class MyBook extends StatefulWidget {
-  final User? user;
+   User? user;
 
   MyBook({ this.user, super.key});
 
