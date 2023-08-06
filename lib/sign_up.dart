@@ -23,8 +23,9 @@ class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController emailController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _isValid = false;
+  bool _isEmailValid = false;
 
- 
+
   void saveUs() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     String jsonbook = jsonEncode(userList);
@@ -53,15 +54,15 @@ class _SignUpPageState extends State<SignUpPage> {
         );
         return;
       }
-    String userId = Uuid().v4();
+      String userId = Uuid().v4();
 
       // Create a new User object
-     User newUser = User(
-      userId: userId,
-      userName: newUsername,
-      email: emailController.text,
-      password: passwordController.text,
-    );
+      User newUser = User(
+        userId: userId,
+        userName: newUsername,
+        email: emailController.text,
+        password: passwordController.text,
+      );
       // Add the new user to the user list
       setState(() {
         userList.add(newUser);
@@ -73,7 +74,7 @@ class _SignUpPageState extends State<SignUpPage> {
       // Navigate to the MyBook page
       await Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => MyBook()),
+        MaterialPageRoute(builder: (context) => MyBook(user: newUser,)),
       );
     }
   }
@@ -81,14 +82,16 @@ class _SignUpPageState extends State<SignUpPage> {
   bool doesUserExist(String username) {
     return userList.any((user) => user.userName == username);
   }
-void loadUserList() async {
-  SharedPreferences preferences = await SharedPreferences.getInstance();
-  String? jsonUserList = preferences.getString("user");
-  if (jsonUserList != null && jsonUserList.isNotEmpty) {
-    List<dynamic> decodedList = jsonDecode(jsonUserList);
-    userList = decodedList.map((userMap) => User.fromJson(userMap)).toList();
+
+  void loadUserList() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String? jsonUserList = preferences.getString("user");
+    if (jsonUserList != null && jsonUserList.isNotEmpty) {
+      List<dynamic> decodedList = jsonDecode(jsonUserList);
+      userList = decodedList.map((userMap) => User.fromJson(userMap)).toList();
+    }
   }
-}
+
   @override
   void initState() {
     loadUserList();
@@ -136,31 +139,28 @@ void loadUserList() async {
                           filled: true,
                           hintText: 'Username',
                           hintStyle: TextStyle(color: Colors.grey[500]),
-                          suffixIcon: _isValid
-                              ? Icon(
-                                  Icons.check,
-                                  color: Colors.green,
-                                )
-                              : Icon(
-                                  Icons.close,
-                                  color: Colors.red,
-                                ),
                         ),
+                        onChanged: (value) {
+                          setState(() {
+                            _isValid = value.isNotEmpty;
+                          });
+                        },
                         validator: (value) {
                           if (value!.isEmpty) {
-                            setState(() {
-                              _isValid = false;
-                            });
                             return 'Please enter a username';
-                          } else {
-                            setState(() {
-                              _isValid = true;
-                            });
-                            return null;
                           }
+                          return null;
                         },
                       ),
                       const SizedBox(height: 10),
+                      Text(
+                        _isValid ? '' : '',
+                        style: TextStyle(
+                          color: _isValid ? Colors.green : Colors.red,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                       TextFormField(
                         controller: emailController,
                         obscureText: false,
@@ -175,35 +175,34 @@ void loadUserList() async {
                           filled: true,
                           hintText: 'Email',
                           hintStyle: TextStyle(color: Colors.grey[500]),
-                          suffixIcon: _isValid
-                              ? Icon(
-                                  Icons.check,
-                                  color: Colors.green,
-                                )
-                              : Icon(
-                                  Icons.close,
-                                  color: Colors.red,
-                                ),
                         ),
+                        onChanged: (value) {
+                          setState(() {
+                            _isEmailValid = RegExp(
+                                    r"^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                                .hasMatch(value);
+                          });
+                        },
                         validator: (value) {
-                          RegExp emailRegExp = RegExp(r"^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
                           if (value!.isEmpty) {
-                            setState(() {
-                              _isValid = false;
-                            });
-                            return 'Please enter a email';
-                          } else if (!emailRegExp.hasMatch(value)) {
-                            setState(() {
-                              _isValid = false;
-                            });
+                            return 'Please enter an email';
+                          } else if (!RegExp(
+                                  r"^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                              .hasMatch(value)) {
                             return 'Invalid email format';
                           }
-                          setState(() {
-                            _isValid = true;
-                          });
                           return null;
                         },
                       ),
+                      const SizedBox(height: 10),
+                      Text(
+                        _isEmailValid ? '' : 'email like this: (example@XXXX.com)',
+                        style: TextStyle(
+                          color: _isEmailValid ? Colors.green : Colors.red,
+                          fontSize: 12,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
                       const SizedBox(height: 10),
                       TextFormField(
                         controller: passwordController,
@@ -219,36 +218,86 @@ void loadUserList() async {
                           filled: true,
                           hintText: 'Password',
                           hintStyle: TextStyle(color: Colors.grey[500]),
-                          suffixIcon: _isValid
-                              ? const Icon(
-                                  Icons.check,
-                                  color: Colors.green,
-                                )
-                              : const Icon(
-                                  Icons.close,
-                                  color: Colors.red,
-                                ),
+                          
                         ),
-                        validator: (value) {
+                        onChanged: (value) {
                           RegExp passwordRegExp = RegExp(
                               r'^(?=.*?[A-Za-z])(?=.*?[0-9])(?=.*?[!@#\><*~]).{6,}$');
-
-                          if (value!.isEmpty) {
-                            setState(() {
-                              _isValid = false;
-                            });
-                            return 'Please enter a password';
-                          } else if (!passwordRegExp.hasMatch(value)) {
-                            setState(() {
-                              _isValid = false;
-                            });
-                            return 'Password must contain at least 6 characters, lowercase, numbers, and special characters';
-                          }
                           setState(() {
-                            _isValid = true;
+                            _isValid = passwordRegExp.hasMatch(value);
                           });
+                        },
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return 'Please enter a password';
+                          } else if (value.length < 6) {
+                            return 'Password must contain at least 6 characters';
+                          } else if (!RegExp(r'[a-z]').hasMatch(value)) {
+                            return 'Password must contain lowercase letters';
+                          } else if (!RegExp(r'[0-9]').hasMatch(value)) {
+                            return 'Password must contain numbers';
+                          } else if (!RegExp(r'[!@#\><*~]').hasMatch(value)) {
+                            return 'Password must contain special characters';
+                          }
                           return null;
                         },
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        _isValid && passwordController.text.length >= 6
+                            ? ''
+                            : 'Password must contain at least 6 characters',
+                        style: TextStyle(
+                          color: _isValid && passwordController.text.length >= 6
+                              ? Colors.green
+                              : Colors.red,
+                          fontSize: 12,
+                        ),
+                      ),
+                      Text(
+                        _isValid &&
+                                RegExp(r'[a-z]')
+                                    .hasMatch(passwordController.text)
+                            ? ''
+                            : 'Password must contain lowercase letters',
+                        style: TextStyle(
+                          color: _isValid &&
+                                  RegExp(r'[a-z]')
+                                      .hasMatch(passwordController.text)
+                              ? Colors.green
+                              : Colors.red,
+                          fontSize: 12,
+                        ),
+                      ),
+                      Text(
+                        _isValid &&
+                                RegExp(r'[0-9]')
+                                    .hasMatch(passwordController.text)
+                            ? ''
+                            : 'Password must contain numbers',
+                        style: TextStyle(
+                          color: _isValid &&
+                                  RegExp(r'[0-9]')
+                                      .hasMatch(passwordController.text)
+                              ? Colors.green
+                              : Colors.red,
+                          fontSize: 12,
+                        ),
+                      ),
+                      Text(
+                        _isValid &&
+                                RegExp(r'[!@#\><*~]')
+                                    .hasMatch(passwordController.text)
+                            ? ''
+                            : 'Password must contain special characters',
+                        style: TextStyle(
+                          color: _isValid &&
+                                  RegExp(r'[!@#\><*~]')
+                                      .hasMatch(passwordController.text)
+                              ? Colors.green
+                              : Colors.red,
+                          fontSize: 12,
+                        ),
                       ),
                     ],
                   ),

@@ -49,9 +49,9 @@ class _MyDetailPageState extends State<MyDetailPage> {
                   IconButton(
                     onPressed: () {
                       setState(() {
-                        delete();
-                      }); 
-                       Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) => MyBook(),));
+                        widget.onDelete();
+                      });
+                     
                     },
                     icon: Icon(Icons.delete_forever_rounded),
                   ),
@@ -80,7 +80,7 @@ class _MyDetailPageState extends State<MyDetailPage> {
     }
   }
 
-  delete()  {
+  delete() {
     setState(() {
       widget.onDelete();
     });

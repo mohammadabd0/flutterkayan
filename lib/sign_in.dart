@@ -31,18 +31,25 @@ class _LoginPageState extends State<LoginPage> {
 
   // Sign user in method
   void signInUser() async {
-     if (_formKey.currentState!.validate()) {
+   if (_formKey.currentState!.validate()) {
     String username = usernameController.text;
-    if (doesUserExist(username, widget.userLists,)) {
-      
+    if (doesUserExist(username, widget.userLists)) {
+      // Set the login status to true
+      SharedPreferences preferences = await SharedPreferences.getInstance();
+      await preferences.setBool("isLoggedIn", true);
+
+      // Find the user from the userLists based on the username
+      User signedInUser = widget.userLists.firstWhere((user) => user.userName == username);
+
+      // Navigate to the book list page and pass the user data
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => MyBook(),
+          builder: (context) => MyBook(user: signedInUser),
         ),
       );
-
     } else {
+      // Show a dialog if user does not exist
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -58,8 +65,7 @@ class _LoginPageState extends State<LoginPage> {
       );
     }
   }
-  }
-
+}
   void loadUser() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     String jsonuser = preferences.getString("user") ?? '[]';
