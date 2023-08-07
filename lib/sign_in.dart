@@ -5,12 +5,12 @@ import 'package:flutter_application_task1/book_list.dart';
 import 'package:flutter_application_task1/sign_up.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
+import 'model/current_user.dart';
 import 'model/user.dart';
 
 class LoginPage extends StatefulWidget {
-  List<User> userLists;
 
-  LoginPage({required this.userLists, super.key});
+  LoginPage({ super.key});
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -20,8 +20,11 @@ class _LoginPageState extends State<LoginPage> {
     bool newuser =false;
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+    final TextEditingController emailController = TextEditingController();
+
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
+  List<User> lsitData = [];
 
   // Check if a user exists based on their username
   bool doesUserExist(String username, List<User> userList,) {
@@ -32,23 +35,29 @@ class _LoginPageState extends State<LoginPage> {
   // Sign user in method
   void signInUser() async {
    if (_formKey.currentState!.validate()) {
+     _formKey.currentState!.save();
     String username = usernameController.text;
-    if (doesUserExist(username, widget.userLists)) {
-      // Set the login status to true
-      SharedPreferences preferences = await SharedPreferences.getInstance();
-      await preferences.setBool("isLoggedIn", true);
-
-      // Find the user from the userLists based on the username
-      User signedInUser = widget.userLists.firstWhere((user) => user.userName == username);
-
-      // Navigate to the book list page and pass the user data
+    String password = passwordController.text;
+    
+     User? Cuser;
+    for (var user in lsitData) {
+      if (user.userName == username && user.password == password) {
+        Cuser = user;
+        break;
+      }
+    }
+     if (Cuser != null) {
+      // Login successful
+      
+      CurrentUser().signUpCurrent(Cuser.userId!);
+      loadData();
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => MyBook(user: signedInUser),
+          builder: (context) => MyBook(CurrentUserID: Cuser!.userId, ),
         ),
       );
-    } else {
+      } else {
       // Show a dialog if user does not exist
       showDialog(
         context: context,
@@ -57,7 +66,7 @@ class _LoginPageState extends State<LoginPage> {
           content: Text('Please sign up before signing in.'),
           actions: [
             TextButton(
-              onPressed: () => Navigator.of(context).pop(widget.userLists),
+              onPressed: () => Navigator.of(context).pop(),
               child: Text('OK'),
             ),
           ],
@@ -66,23 +75,21 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 }
-  void loadUser() async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    String jsonuser = preferences.getString("user") ?? '[]';
-    print(jsonuser);
-
-    List<dynamic> userData = jsonDecode(jsonuser);
-    List<User> users = userData.map((e) => User.fromJson(e)).toList();
+ Future<void> loadData() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String jsonUsers = prefs.getString('user') ?? '[]';
+  List<dynamic> userData = jsonDecode(jsonUsers);
+  lsitData = userData.map((user) => User.fromJson(user)).toList();
+}
+ @override
+void initState() {
+  loadData().then((_) {
     setState(() {
-      widget.userLists = users;
+      newuser = true; // Set newuser to true after data is loaded
     });
-  }
-
-  @override
-  void initState() {
-    loadUser();
-    super.initState();
-  } 
+  });
+  super.initState();
+}
 
   @override
   Widget build(BuildContext context) {

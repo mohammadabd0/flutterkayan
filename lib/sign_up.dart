@@ -5,7 +5,8 @@ import 'package:flutter_application_task1/book_list.dart';
 import 'package:flutter_application_task1/sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
-
+import 'public.dart';
+import 'model/current_user.dart';
 import 'model/user.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -16,7 +17,6 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpPage> {
-  List<User> userList = [];
   bool isLoading = false;
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -26,71 +26,78 @@ class _SignUpPageState extends State<SignUpPage> {
   bool _isEmailValid = false;
 
 
-  void saveUs() async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    String jsonbook = jsonEncode(userList);
-    preferences.setString("user", jsonbook);
+   Future<void> saveData(User signUp) async {
+    List<User> users = await loadUserList();
+    users.add(signUp);
+
+    final Data = users.map((user) => user.toJson()).toList();
+    final Jsondatauser = json.encode(Data);
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('user', Jsondatauser);
   }
-
-  void saveUser() async {
-    // Ensure the form is valid
-    if (_formKey.currentState!.validate()) {
-      String newUsername = usernameController.text;
-      // Check if the username already exists
-      if (doesUserExist(newUsername)) {
-        // Show an error dialog since the username is already taken
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text('Username already exists'),
-            content: Text('Please choose a different username.'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text('OK'),
-              ),
-            ],
-          ),
-        );
-        return;
-      }
-      String userId = Uuid().v4();
-
-      // Create a new User object
-      User newUser = User(
-        userId: userId,
-        userName: newUsername,
-        email: emailController.text,
-        password: passwordController.text,
+Future<List<User>> loadUserList() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String jsonUsers = prefs.getString('user') ?? '[]'; // Use the correct key 'user'
+  List<dynamic> userData = jsonDecode(jsonUsers);
+  List<User> users = userData.map((user) => User.fromJson(user)).toList();
+  return users;
+}
+ Future<bool> doesUserExist(String username) async {
+  List<User> userList = await loadUserList(); // Wait for the Future to complete
+  return userList.any((user) => user.userName == username);
+}
+void saveUser() async {
+  // Ensure the form is valid
+  if (_formKey.currentState!.validate()) {
+    String newUsername = usernameController.text;
+    // Check if the username already exists
+    bool usernameExists = await doesUserExist(newUsername); // Wait for the Future<bool> to complete
+    if (usernameExists) {
+      // Show an error dialog since the username is already taken
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Username already exists'),
+          content: Text('Please choose a different username.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('OK'),
+            ),
+          ],
+        ),
       );
-      // Add the new user to the user list
-      setState(() {
-        userList.add(newUser);
-      });
-
-      // Save the updated user list to shared preferences
-      saveUs();
-
-      // Navigate to the MyBook page
-      await Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => MyBook(user: newUser,)),
-      );
+      return;
     }
-  }
+    String userId = Uuid().v4();
 
-  bool doesUserExist(String username) {
-    return userList.any((user) => user.userName == username);
-  }
+    // Create a new User object
+    User newUser = User(
+      userId: userId,
+      userName: newUsername,
+      email: emailController.text,
+      password: passwordController.text,
+    );
+    // Add the new user to the user list
+    await saveData(newUser);
 
-  void loadUserList() async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    String? jsonUserList = preferences.getString("user");
-    if (jsonUserList != null && jsonUserList.isNotEmpty) {
-      List<dynamic> decodedList = jsonDecode(jsonUserList);
-      userList = decodedList.map((userMap) => User.fromJson(userMap)).toList();
-    }
+    // Set the current user and navigate to the MyBook page
+    CurrentUser currentUser = CurrentUser();
+    currentUser.signUpCurrent(userId);
+    setState(() {
+      shareduser = userId;
+    });
+    // Navigate to the MyBook page
+    await Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => MyBook(CurrentUserID: userId,email: emailController.text,userName: newUsername,)),
+    );
   }
+}
+
+ 
+ 
 
   @override
   void initState() {
@@ -354,7 +361,7 @@ class _SignUpPageState extends State<SignUpPage> {
               const SizedBox(height: 50),
 
               // not a member? register now
-              Row(
+           /*   Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
@@ -368,7 +375,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         context,
                         MaterialPageRoute(
                             builder: (context) =>
-                                LoginPage(userLists: userList)),
+                                LoginPage()),
                       );
 
                       // Update the userList with the result from LoginPage
@@ -387,7 +394,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                   )
                 ],
-              )
+              )*/
             ],
           ),
         ),

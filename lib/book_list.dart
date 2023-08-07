@@ -12,14 +12,16 @@ import 'package:flutter_application_task1/sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'model/book.dart';
 
+import 'model/current_user.dart';
 import 'model/user.dart';
 
 enum SortOption { nameBook, nameAuthor, dateTime }
 
 class MyBook extends StatefulWidget {
-   User? user;
-
-  MyBook({ this.user, super.key});
+  final String? CurrentUserID;
+  String? userName;
+  String? email;
+  MyBook({this.CurrentUserID, this.email, this.userName, super.key});
 
   @override
   State<MyBook> createState() => _MyBookState();
@@ -44,23 +46,30 @@ class _MyBookState extends State<MyBook> {
         isLoading = false;
       });
     });
-
+    loadUserData();
     loadbook(); // Load the saved books
     super.initState();
   }
 
-  void logoutUser(BuildContext context) async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    preferences.setBool('isLoggedIn', false);
-    preferences.remove('userId');
-    preferences.remove('userName');
+  void loadUserData() async {
+    if (widget.CurrentUserID != null) {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String jsonUsers = prefs.getString('user') ?? '[]';
+      List<dynamic> userData = jsonDecode(jsonUsers);
+      List<User> userList =
+          userData.map((user) => User.fromJson(user)).toList();
 
-Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => LoginPage(userLists: []),
-        ),
-      );
+      User? currentUser =
+          userList.firstWhere((user) => user.userId == widget.CurrentUserID);
+
+      if (currentUser != null) {
+        setState(() {
+          widget.userName = currentUser.userName;
+          widget.email = currentUser.email;
+          isLoading = false;
+        });
+      }
+    }
   }
 
   void loadbook() async {
@@ -82,14 +91,13 @@ Navigator.pushReplacement(
 
   @override
   Widget build(BuildContext context) {
-User user = widget.user ?? User(); 
     return isLoading ? loadingPage() : buildList();
   }
 
   AppBar buildAppBar() {
     return AppBar(
       backgroundColor: Theme.of(context).colorScheme.secondary,
-      title: Text(
+      title: const Text(
         "Book List",
         style: TextStyle(color: Colors.white),
       ),
@@ -103,15 +111,15 @@ User user = widget.user ?? User();
             });
           },
           itemBuilder: (context) => [
-            PopupMenuItem(
+            const PopupMenuItem(
               value: SortOption.nameBook,
               child: Text('Sort by Name Book'),
             ),
-            PopupMenuItem(
+            const PopupMenuItem(
               value: SortOption.nameAuthor,
               child: Text('Sort by Name Author'),
             ),
-            PopupMenuItem(
+            const PopupMenuItem(
               value: SortOption.dateTime,
               child: Text('Sort by Date Time'),
             ),
@@ -133,8 +141,9 @@ User user = widget.user ?? User();
       child: Scaffold(
         appBar: buildAppBar(),
         drawer: Drawer(
+
           width: 300,
-          backgroundColor: Color.fromARGB(255, 58, 131, 183),
+          backgroundColor: Colors.white,
           elevation: 2,
           child: ListView(
             children: [
@@ -143,11 +152,11 @@ User user = widget.user ?? User();
                 onTap: () {},
               ),
               ListTile(
-                title: Text('Username: ${widget.user?.userName ?? ''}'),
+                title: Text('Username: ${widget.userName ?? ''}'),
                 onTap: () {},
               ),
               ListTile(
-                title: Text('Email: ${widget.user?.email ?? ''}'),
+                title: Text('Email: ${widget.email ?? ''}'),
                 onTap: () {},
               ),
               ListTile(
@@ -176,7 +185,14 @@ User user = widget.user ?? User();
               ListTile(
                 title: Text('Logout'),
                 onTap: () {
-                  logoutUser(context);
+                  CurrentUser currentUser = CurrentUser();
+                  currentUser.logout();
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => LoginPage(),
+                    ),
+                  );
                 },
               ),
             ],
