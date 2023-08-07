@@ -1,69 +1,50 @@
-import 'dart:convert';
+
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_task1/book_list.dart';
 import 'package:flutter_application_task1/sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:flutter_application_task1/public.dart';
 import 'model/user.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   
 
   const MyApp({Key? key}) : super(key: key);
 
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  List<User> userList = [];
-bool isLoggedIn = false; // Add this variable to keep track of the login status
-User? currentUser;
-
-  @override
-  void initState() {
-    checkLoginStatus();
-    loadUser(); // Check the login status when the app starts
-    super.initState();
-  }
-    void loadUser() async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    String jsonuser = preferences.getString("user") ?? '[]';
-    List<dynamic> userData = jsonDecode(jsonuser);
-    List<User> users = userData.map((e) => User.fromJson(e)).toList();
-    setState(() {
-      userList = users; 
-    });
-    
+  Future<String> getUserID() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String userid = prefs.getString('currentUserId') ?? "";
+    return userid;
   }
 
-void checkLoginStatus() async {
-  SharedPreferences preferences = await SharedPreferences.getInstance();
-  bool isLoggedIn = preferences.getBool("isLoggedIn") ?? false;
-
-  setState(() {
-    this.isLoggedIn = isLoggedIn;
-  });
-}
-
-  @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      
-      title: 'Flutter Demo',
-        debugShowCheckedModeBanner: false,
+ debugShowCheckedModeBanner: false,
       theme: ThemeData(
        
         colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 58, 131, 183)),
-        useMaterial3: true,
+        useMaterial3: true, 
+      ),    
+         home: FutureBuilder<String>(
+        future: getUserID(),
+        builder: (context, snapshot) {
+          String? currentUserId = snapshot.data;
+          if (currentUserId != null && currentUserId.isNotEmpty) {
+            return MyBook(CurrentUserID: currentUserId);
+          }
+
+        
+
+          else {
+            return LoginPage();
+          }
+        },
       ),
-    
-    home: isLoggedIn ? MyBook() : LoginPage(userLists: userList),
     );
   }
 }
