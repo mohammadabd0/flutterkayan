@@ -4,16 +4,17 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_application_task1/addbook.dart';
-import 'package:flutter_application_task1/detail_page.dart';
-import 'package:flutter_application_task1/myLibrary.dart';
-import 'package:flutter_application_task1/settengs.dart';
-import 'package:flutter_application_task1/sign_in.dart';
+import 'package:flutter_application_task1/bookfolder/addbook.dart';
+import 'package:flutter_application_task1/bookfolder/detail_page.dart';
+import 'package:flutter_application_task1/drawerFolder/myLibrary.dart';
+import 'package:flutter_application_task1/drawerFolder/myProfile.dart';
+import 'package:flutter_application_task1/drawerFolder/settengs.dart';
+import 'package:flutter_application_task1/loginService/sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'model/book.dart';
+import '../model/book.dart';
 
-import 'model/current_user.dart';
-import 'model/user.dart';
+import '../model/current_user.dart';
+import '../model/user.dart';
 
 enum SortOption { nameBook, nameAuthor, dateTime }
 
@@ -141,7 +142,6 @@ class _MyBookState extends State<MyBook> {
       child: Scaffold(
         appBar: buildAppBar(),
         drawer: Drawer(
-
           width: 300,
           backgroundColor: Colors.white,
           elevation: 2,
@@ -149,15 +149,16 @@ class _MyBookState extends State<MyBook> {
             children: [
               ListTile(
                 title: Text('My Profile'),
-                onTap: () {},
-              ),
-              ListTile(
-                title: Text('Username: ${widget.userName ?? ''}'),
-                onTap: () {},
-              ),
-              ListTile(
-                title: Text('Email: ${widget.email ?? ''}'),
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => MyProfilePage(
+                              email: widget.email,
+                              username: widget.userName,
+                            )),
+                  );
+                },
               ),
               ListTile(
                 title: Text('My Library'),
@@ -268,6 +269,7 @@ class _MyBookState extends State<MyBook> {
                 booklist.add(result as Book);
               });
               saveBook();
+              loadUserData();
             }
           },
         ),
@@ -297,7 +299,7 @@ class _MyBookState extends State<MyBook> {
           booklist.sort((a, b) => a.getauthor.compareTo(b.getauthor));
           break;
         case SortOption.dateTime:
-          booklist.sort((a, b) => a.getdateTime.compareTo(b.getdateTime));
+          booklist.sort((a, b) => a.getdateTime!.compareTo(b.getdateTime!));
           break;
       }
     });
@@ -320,6 +322,8 @@ class _MyBookState extends State<MyBook> {
                       setState(() {
                         booklist.removeAt(index);
                       });
+                      loadUserData();
+
                       saveBook();
                       Navigator.pushReplacement(
                           context,
@@ -358,6 +362,7 @@ class _MyBookState extends State<MyBook> {
         booklist[index] = editedBook;
       });
       saveBook();
+      loadUserData();
     }
   }
 }

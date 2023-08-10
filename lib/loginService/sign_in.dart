@@ -1,12 +1,12 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_application_task1/book_list.dart';
-import 'package:flutter_application_task1/sign_up.dart';
+import 'package:flutter_application_task1/bookfolder/book_list.dart';
+import 'package:flutter_application_task1/loginService/sign_up.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
-import 'model/current_user.dart';
-import 'model/user.dart';
+import '../model/current_user.dart';
+import '../model/user.dart';
 
 class LoginPage extends StatefulWidget {
 

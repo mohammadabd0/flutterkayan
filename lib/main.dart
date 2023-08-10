@@ -1,10 +1,10 @@
 
 
 import 'package:flutter/material.dart';
-import 'package:flutter_application_task1/book_list.dart';
-import 'package:flutter_application_task1/sign_in.dart';
+import 'package:flutter_application_task1/bookfolder/book_list.dart';
+import 'package:flutter_application_task1/loginService/sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_application_task1/public.dart';
+import 'package:flutter_application_task1/loginService/public.dart';
 import 'model/user.dart';
 
 void main() {

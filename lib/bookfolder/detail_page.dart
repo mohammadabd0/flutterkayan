@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_task1/addbook.dart';
-import 'package:flutter_application_task1/book_list.dart';
+import 'package:flutter_application_task1/bookfolder/addbook.dart';
+import 'package:flutter_application_task1/bookfolder/book_list.dart';
 import 'package:flutter_application_task1/model/book.dart';
 
 class MyDetailPage extends StatefulWidget {

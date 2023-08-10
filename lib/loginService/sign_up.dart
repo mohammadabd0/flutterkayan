@@ -1,13 +1,13 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_application_task1/book_list.dart';
-import 'package:flutter_application_task1/sign_in.dart';
+import 'package:flutter_application_task1/bookfolder/book_list.dart';
+import 'package:flutter_application_task1/loginService/sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import 'public.dart';
-import 'model/current_user.dart';
-import 'model/user.dart';
+import '../model/current_user.dart';
+import '../model/user.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
