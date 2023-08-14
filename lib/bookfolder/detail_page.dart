@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_task1/addbook.dart';
-import 'package:flutter_application_task1/book_list.dart';
+import 'package:flutter_application_task1/bookfolder/addbook.dart';
+import 'package:flutter_application_task1/bookfolder/book_list.dart';
 import 'package:flutter_application_task1/model/book.dart';
 
 class MyDetailPage extends StatefulWidget {
@@ -21,7 +21,8 @@ class _MyDetailPageState extends State<MyDetailPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.secondary,
+        iconTheme: IconThemeData(color: Colors.white),
+        backgroundColor: Colors.black,
         title: const Text(
           "Book Details",
           style: TextStyle(color: Colors.white),
