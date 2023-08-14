@@ -38,7 +38,7 @@ class _MyBookState extends State<MyBook> {
   late List<Book> booklist = [];
   bool isLoading = true;
   SortOption selectedSortOption = SortOption.dateTime;
-
+  List<User>? userList;
   @override
   void initState() {
     Timer(Duration(seconds: 2), () {
@@ -57,11 +57,10 @@ class _MyBookState extends State<MyBook> {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String jsonUsers = prefs.getString('user') ?? '[]';
       List<dynamic> userData = jsonDecode(jsonUsers);
-      List<User> userList =
-          userData.map((user) => User.fromJson(user)).toList();
+      userList = userData.map((user) => User.fromJson(user)).toList();
 
       User? currentUser =
-          userList.firstWhere((user) => user.userId == widget.CurrentUserID);
+          userList!.firstWhere((user) => user.userId == widget.CurrentUserID);
 
       if (currentUser != null) {
         setState(() {
@@ -71,6 +70,12 @@ class _MyBookState extends State<MyBook> {
         });
       }
     }
+  }
+
+  void saveUs() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String jsonuser = jsonEncode(userList);
+    preferences.setString("user", jsonuser);
   }
 
   void loadbook() async {
@@ -92,16 +97,19 @@ class _MyBookState extends State<MyBook> {
 
   @override
   Widget build(BuildContext context) {
+    loadUserData();
+
     return isLoading ? loadingPage() : buildList();
   }
 
   AppBar buildAppBar() {
     return AppBar(
-      backgroundColor: Theme.of(context).colorScheme.secondary,
+      backgroundColor: Colors.black,
       title: const Text(
-        "Book List",
+        "Book shope",
         style: TextStyle(color: Colors.white),
       ),
+      iconTheme: IconThemeData(color: Colors.white),
       actions: [
         PopupMenuButton<SortOption>(
           icon: Icon(Icons.sort, color: Colors.white),
@@ -142,61 +150,70 @@ class _MyBookState extends State<MyBook> {
       child: Scaffold(
         appBar: buildAppBar(),
         drawer: Drawer(
+          shadowColor: Colors.white,
           width: 300,
           backgroundColor: Colors.white,
-          elevation: 2,
-          child: ListView(
-            children: [
-              ListTile(
-                title: Text('My Profile'),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => MyProfilePage(
-                              email: widget.email,
-                              username: widget.userName,
-                            )),
-                  );
-                },
+          child: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.blueGrey, Colors.white],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
               ),
-              ListTile(
-                title: Text('My Library'),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => MyLibraryPage(),
-                    ),
-                  );
-                },
-              ),
-              ListTile(
-                title: Text('Settings'),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => MySettingsPage(),
-                    ),
-                  );
-                },
-              ),
-              Divider(height: 10),
-              ListTile(
-                title: Text('Logout'),
-                onTap: () {
-                  CurrentUser currentUser = CurrentUser();
-                  currentUser.logout();
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => LoginPage(),
-                    ),
-                  );
-                },
-              ),
-            ],
+            ),
+            child: ListView(
+              children: [
+                ListTile(
+                  title: Text('My Profile '),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => MyProfilePage(
+                                email: widget.email,
+                                username: widget.userName,
+                              )),
+                    );
+                  },
+                ),
+                ListTile(
+                  title: Text('My Library'),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => MyLibraryPage(),
+                      ),
+                    );
+                  },
+                ),
+                ListTile(
+                  title: Text('Settings'),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => MySettingsPage(),
+                      ),
+                    );
+                  },
+                ),
+                Divider(height: 10),
+                ListTile(
+                  title: Text('Logout'),
+                  onTap: () {
+                    CurrentUser currentUser = CurrentUser();
+                    currentUser.logout();
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => LoginPage(),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
         ),
         body: Padding(
@@ -214,22 +231,53 @@ class _MyBookState extends State<MyBook> {
                       _navigateToDetailPage(index);
                     },
                     child: Card(
-                      elevation: 2,
-                      child: Row(
+                      color: Colors.white,
+                      elevation: 0,
+                      shadowColor: Colors.black,
+                    
+                      shape: RoundedRectangleBorder(
+                      
+                        side: BorderSide(color: Colors.black),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Image.asset(
-                            book.getimage,
-                            width: 80,
-                          ),
-                          Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: ListTile(
-                                title: Text(book.getnameBook),
-                                subtitle: Text(book.getauthor),
-                                trailing: Text(book.getdateTime.toString()),
-                              ),
+                          // Add padding around the row widget
+                          Padding(
+                            padding: const EdgeInsets.all(15),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Image.network(
+                                  book.getimage,
+                                  height: 130,
+                                  width: 100,
+                                  fit: BoxFit.fill,
+                                ),
+                                Container(width: 20),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Container(height: 5),
+                                      Text(
+                                        book.getnameBook,
+                                      ),
+                                      Container(height: 5),
+                                      Text(
+                                        book.getauthor,
+                                      ),
+                                      Container(height: 10),
+                                      Text(
+                                        book.getdateTime.toString(),
+                                        maxLines: 2,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
@@ -242,18 +290,19 @@ class _MyBookState extends State<MyBook> {
           ),
         ),
         floatingActionButton: FloatingActionButton(
+          backgroundColor: Colors.black,
           child: const Icon(
             Icons.add,
-            color: Colors.black,
+            color: Colors.white,
           ),
           onPressed: () async {
-            var randomImageIndex = Random().nextInt(bookImages.length);
+            //var randomImageIndex = Random().nextInt(bookImages.length);
 
             Book newbook = Book(
-                author: "",
+                author: " ",
                 dateTime: DateTime.now(),
-                nameBook: "",
-                image: bookImages[randomImageIndex]);
+                nameBook: " ",
+                image: " ");
             var result = await Navigator.push(
               context,
               MaterialPageRoute(
@@ -325,11 +374,14 @@ class _MyBookState extends State<MyBook> {
                       loadUserData();
 
                       saveBook();
-                      Navigator.pushReplacement(
+                      Navigator.pop(context);
+                      Navigator.pop(context);
+
+                      /* Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
                             builder: (context) => MyBook(),
-                          )); // Save the updated book list after deletion
+                          )); */ // Save the updated book list after deletion
                     },
                     child: const Text("Yes"),
                   ),

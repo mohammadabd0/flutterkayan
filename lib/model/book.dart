@@ -36,6 +36,9 @@ class Book {
   String get getimage {
     return _image!;
   }
+  set setimage(String newimage) {
+    _image = newimage;
+  }
 
   set setauthor(String newAuthor) {
     _author = newAuthor;
