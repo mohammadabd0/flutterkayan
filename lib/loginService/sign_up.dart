@@ -1,11 +1,8 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_application_task1/bookfolder/book_list.dart';
-import 'package:flutter_application_task1/loginService/sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
-import 'public.dart';
 import '../model/current_user.dart';
 import '../model/user.dart';
 
@@ -24,80 +21,71 @@ class _SignUpPageState extends State<SignUpPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _isValid = false;
   bool _isEmailValid = false;
-
-
-   Future<void> saveData(User signUp) async {
+  Future<void> saveData(User signUp) async {
     List<User> users = await loadUserList();
     users.add(signUp);
-
-    final Data = users.map((user) => user.toJson()).toList();
-    final Jsondatauser = json.encode(Data);
-
+    final data = users.map((user) => user.toJson()).toList();
+    final jsonDataUser = json.encode(data);
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('user', Jsondatauser);
+    await prefs.setString('user', jsonDataUser);
   }
-Future<List<User>> loadUserList() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  String jsonUsers = prefs.getString('user') ?? '[]'; // Use the correct key 'user'
-  List<dynamic> userData = jsonDecode(jsonUsers);
-  List<User> users = userData.map((user) => User.fromJson(user)).toList();
-  return users;
-}
- Future<bool> doesUserExist(String username) async {
-  List<User> userList = await loadUserList(); // Wait for the Future to complete
-  return userList.any((user) => user.userName == username);
-}
-void saveUser() async {
-  // Ensure the form is valid
-  if (_formKey.currentState!.validate()) {
-    String newUsername = usernameController.text;
-    // Check if the username already exists
-    bool usernameExists = await doesUserExist(newUsername); // Wait for the Future<bool> to complete
-    if (usernameExists) {
-      // Show an error dialog since the username is already taken
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text('Username already exists'),
-          content: Text('Please choose a different username.'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text('OK'),
-            ),
-          ],
-        ),
+
+  Future<List<User>> loadUserList() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String jsonUsers = prefs.getString('user') ?? '[]';
+    List<dynamic> userData = jsonDecode(jsonUsers);
+    List<User> users = userData.map((user) => User.fromJson(user)).toList();
+    return users;
+  }
+
+  Future<bool> doesUserExist(String username) async {
+    List<User> userList = await loadUserList();
+    return userList.any((user) => user.userName == username);
+  }
+
+  void saveUser() async {
+    if (_formKey.currentState!.validate()) {
+      String newUsername = usernameController.text;
+      bool usernameExists = await doesUserExist(newUsername);
+      if (usernameExists) {
+        // ignore: use_build_context_synchronously
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Username already exists'),
+            content: const Text('Please choose a different username.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+        return;
+      }
+      String userId = const Uuid().v4();
+      User newUser = User(
+        userId: userId,
+        userName: newUsername,
+        email: emailController.text,
+        password: passwordController.text,
       );
-      return;
+      await saveData(newUser);
+      CurrentUser currentUser = CurrentUser();
+      currentUser.signUpCurrent(userId);
+      // ignore: use_build_context_synchronously
+      await Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (context) => MyBook(
+                  currentUserId: userId,
+                  email: emailController.text,
+                  userName: newUsername,
+                )),
+      );
     }
-    String userId = Uuid().v4();
-
-    // Create a new User object
-    User newUser = User(
-      userId: userId,
-      userName: newUsername,
-      email: emailController.text,
-      password: passwordController.text,
-    );
-    // Add the new user to the user list
-    await saveData(newUser);
-
-    // Set the current user and navigate to the MyBook page
-    CurrentUser currentUser = CurrentUser();
-    currentUser.signUpCurrent(userId);
-    setState(() {
-      shareduser = userId;
-    });
-    // Navigate to the MyBook page
-    await Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => MyBook(CurrentUserID: userId,email: emailController.text,userName: newUsername,)),
-    );
   }
-}
-
- 
- 
 
   @override
   void initState() {
@@ -203,7 +191,9 @@ void saveUser() async {
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        _isEmailValid ? '' : 'email like this: (example@XXXX.com)',
+                        _isEmailValid
+                            ? ''
+                            : 'email like this: (example@XXXX.com)',
                         style: TextStyle(
                           color: _isEmailValid ? Colors.green : Colors.red,
                           fontSize: 12,
@@ -225,7 +215,6 @@ void saveUser() async {
                           filled: true,
                           hintText: 'Password',
                           hintStyle: TextStyle(color: Colors.grey[500]),
-                          
                         ),
                         onChanged: (value) {
                           RegExp passwordRegExp = RegExp(
@@ -361,7 +350,7 @@ void saveUser() async {
               const SizedBox(height: 50),
 
               // not a member? register now
-           /*   Row(
+              /*   Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(

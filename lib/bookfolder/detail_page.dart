@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_task1/bookfolder/addbook.dart';
-import 'package:flutter_application_task1/bookfolder/book_list.dart';
 import 'package:flutter_application_task1/model/book.dart';
 
+// ignore: must_be_immutable
 class MyDetailPage extends StatefulWidget {
   late Book book;
   void Function() onDelete;
@@ -21,7 +21,7 @@ class _MyDetailPageState extends State<MyDetailPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: Colors.white),
         backgroundColor: Colors.black,
         title: const Text(
           "Book Details",
@@ -45,16 +45,15 @@ class _MyDetailPageState extends State<MyDetailPage> {
                     onPressed: () {
                       _navigateToAddBook(context);
                     },
-                    icon: Icon(Icons.edit_outlined),
+                    icon: const Icon(Icons.edit_outlined),
                   ),
                   IconButton(
                     onPressed: () {
                       setState(() {
                         widget.onDelete();
                       });
-                     
                     },
-                    icon: Icon(Icons.delete_forever_rounded),
+                    icon: const Icon(Icons.delete_forever_rounded),
                   ),
                 ],
               ),
@@ -77,6 +76,7 @@ class _MyDetailPageState extends State<MyDetailPage> {
       setState(() {
         widget.book = editedBook;
       });
+      // ignore: use_build_context_synchronously
       Navigator.pop(context, widget.book);
     }
   }

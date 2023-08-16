@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:flutter_application_task1/bookfolder/book_list.dart';
 import 'package:flutter_application_task1/loginService/sign_in.dart';
@@ -10,8 +8,6 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  
-
   const MyApp({Key? key}) : super(key: key);
 
   Future<String> getUserID() async {
@@ -20,25 +16,22 @@ class MyApp extends StatelessWidget {
     return userid;
   }
 
+  @override
   Widget build(BuildContext context) {
     return MaterialApp(
- debugShowCheckedModeBanner: false,
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
-       
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 58, 131, 183)),
-        useMaterial3: true, 
-      ),    
-         home: FutureBuilder<String>(
+        colorScheme: ColorScheme.fromSeed(
+            seedColor: const Color.fromARGB(255, 58, 131, 183)),
+        useMaterial3: true,
+      ),
+      home: FutureBuilder<String>(
         future: getUserID(),
         builder: (context, snapshot) {
           String? currentUserId = snapshot.data;
           if (currentUserId != null && currentUserId.isNotEmpty) {
-            return MyBook(CurrentUserID: currentUserId);
-          }
-
-        
-
-          else {
+            return MyBook(currentUserId: currentUserId);
+          } else {
             return LoginPage();
           }
         },

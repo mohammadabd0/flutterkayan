@@ -13,7 +13,7 @@ class _MySettingsPageState extends State<MySettingsPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.secondary,
-        title: Text(
+        title: const Text(
           "Settinges",
           style: TextStyle(color: Colors.white),
         ),

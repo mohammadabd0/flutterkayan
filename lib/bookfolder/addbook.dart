@@ -41,8 +41,6 @@ class _AddBooksState extends State<AddBooks> {
     super.initState();
   }
 
-  bool _isImageSelected = false;
-
   int _selectedIndex = -1;
   @override
   void dispose() {
@@ -65,7 +63,7 @@ class _AddBooksState extends State<AddBooks> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-           SingleChildScrollView(
+            SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: categories.map((category) {
@@ -123,7 +121,7 @@ class _AddBooksState extends State<AddBooks> {
                         if (_selectedIndex == index)
                           Container(
                             color: Colors.white,
-                            child: Positioned(
+                            child: const Positioned(
                               top: 0,
                               right: 0,
                               child: Icon(
@@ -144,18 +142,15 @@ class _AddBooksState extends State<AddBooks> {
                 key: _formKey,
                 child: Column(
                   children: [
-                    
                     FormBuilderTextField(
                       name: "name",
                       decoration: const InputDecoration(
                         enabledBorder: OutlineInputBorder(
-                          borderSide:
-                              BorderSide(color: Colors.black, width: 2),
+                          borderSide: BorderSide(color: Colors.black, width: 2),
                           borderRadius: BorderRadius.all(Radius.circular(20)),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderSide:
-                              BorderSide(color: Colors.black, width: 2),
+                          borderSide: BorderSide(color: Colors.black, width: 2),
                           borderRadius: BorderRadius.all(Radius.circular(20)),
                         ),
                         labelText: "set a name",
@@ -164,7 +159,9 @@ class _AddBooksState extends State<AddBooks> {
                       ),
                       controller: _nameController,
                       validator: (value) {
-                        if (value == null || value.isEmpty || value == newbook.getnameBook) {
+                        if (value == null ||
+                            value.isEmpty ||
+                            value == newbook.getnameBook) {
                           return "Please enter name";
                         }
                         return null;
@@ -173,20 +170,18 @@ class _AddBooksState extends State<AddBooks> {
                         newbook.setnameBook = newValue!;
                       },
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 15,
                     ),
                     FormBuilderTextField(
                       name: "author",
                       decoration: const InputDecoration(
                         enabledBorder: OutlineInputBorder(
-                          borderSide:
-                              BorderSide(color: Colors.black, width: 2),
+                          borderSide: BorderSide(color: Colors.black, width: 2),
                           borderRadius: BorderRadius.all(Radius.circular(20)),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderSide:
-                              BorderSide(color: Colors.black, width: 2),
+                          borderSide: BorderSide(color: Colors.black, width: 2),
                           borderRadius: BorderRadius.all(Radius.circular(20)),
                         ),
                         labelText: "set author",
@@ -195,7 +190,9 @@ class _AddBooksState extends State<AddBooks> {
                       ),
                       controller: _authorController,
                       validator: (value) {
-                        if (value == null || value.isEmpty || value == newbook.getauthor) {
+                        if (value == null ||
+                            value.isEmpty ||
+                            value == newbook.getauthor) {
                           return 'Please enter author';
                         }
                         return null;
@@ -204,7 +201,7 @@ class _AddBooksState extends State<AddBooks> {
                         newbook.setauthor = newValue!;
                       },
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 15,
                     ),
                     FormBuilderDateTimePicker(
@@ -212,19 +209,18 @@ class _AddBooksState extends State<AddBooks> {
                       name: 'date_field',
                       decoration: const InputDecoration(
                         enabledBorder: OutlineInputBorder(
-                          borderSide:
-                              BorderSide(color: Colors.black, width: 2),
+                          borderSide: BorderSide(color: Colors.black, width: 2),
                           borderRadius: BorderRadius.all(Radius.circular(20)),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderSide:
-                              BorderSide(color: Colors.black, width: 2),
+                          borderSide: BorderSide(color: Colors.black, width: 2),
                           borderRadius: BorderRadius.all(Radius.circular(20)),
                         ),
                         labelText: 'Select a date',
                         prefixIcon: Icon(Icons.date_range),
                       ),
                       validator: (value) {
+                        // ignore: unrelated_type_equality_checks
                         if (value == '' || value == newbook.getdateTime) {
                           return 'Please enter date';
                         }
@@ -243,8 +239,6 @@ class _AddBooksState extends State<AddBooks> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          print(_selectedIndex.toString());
-
           if (_selectedIndex < 0) {
             await showDialog(
               context: context,
@@ -263,8 +257,7 @@ class _AddBooksState extends State<AddBooks> {
                 );
               },
             );
-          }
-          else if( _formKey.currentState!.validate()){
+          } else if (_formKey.currentState!.validate()) {
             _formKey.currentState!.save();
             Navigator.pop(context, newbook);
           }

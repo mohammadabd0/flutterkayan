@@ -8,7 +8,6 @@ class MyLibraryPage extends StatefulWidget {
   @override
   State<MyLibraryPage> createState() => _MyLibraryPageState();
 }
-
 class _MyLibraryPageState extends State<MyLibraryPage> {
   List<String> categories = [
     'information technology',
@@ -38,9 +37,9 @@ class _MyLibraryPageState extends State<MyLibraryPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: Colors.white),
         backgroundColor: Colors.black,
-        title: Text(
+        title: const Text(
           "My Library",
           style: TextStyle(color: Colors.white),
         ),
@@ -54,9 +53,9 @@ class _MyLibraryPageState extends State<MyLibraryPage> {
               child: Row(
                 children: categories.map((category) {
                   return Container(
-                    padding: EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(12),
                     child: Container(
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         borderRadius: BorderRadius.all(Radius.circular(10)),
                         color: Colors.black87,
                       ),
@@ -70,7 +69,7 @@ class _MyLibraryPageState extends State<MyLibraryPage> {
                         },
                         child: Text(
                           category,
-                          style: TextStyle(
+                          style: const TextStyle(
                               color: Color.fromARGB(255, 255, 255, 255)),
                         ),
                       ),
@@ -83,7 +82,6 @@ class _MyLibraryPageState extends State<MyLibraryPage> {
           Padding(
             padding: const EdgeInsets.only(top: 65),
             child: ListView.builder(
-              
               shrinkWrap: true,
               itemCount: dataListBook.length,
               itemBuilder: (context, index) {
@@ -92,12 +90,11 @@ class _MyLibraryPageState extends State<MyLibraryPage> {
                   child: Column(
                     children: [
                       Container(
-                    color: Colors.white,
-                           
+                        color: Colors.white,
                         child: Card(
                           elevation: 0,
                           shape: RoundedRectangleBorder(
-                            side: BorderSide(color: Colors.black),
+                            side: const BorderSide(color: Colors.black),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           clipBehavior: Clip.antiAliasWithSaveLayer,
@@ -131,7 +128,8 @@ class _MyLibraryPageState extends State<MyLibraryPage> {
                                           Container(height: 5),
                                           Text(
                                             dataListBook[index].getnameBook,
-                                            style: TextStyle(fontWeight: FontWeight.bold),
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.bold),
                                           ),
                                           Container(height: 5),
                                           Text(
@@ -140,12 +138,11 @@ class _MyLibraryPageState extends State<MyLibraryPage> {
                                           Container(height: 10),
                                           Text(
                                             dataListBook[index]
-                                                    .getdateTime
-                                                    .toString() ??
-                                                "no date ",
+                                                .getdateTime
+                                                .toString(),
                                             maxLines: 2,
                                           ),
-                                            Container(height: 10),
+                                          Container(height: 10),
                                           Row(
                                             children: [
                                               const Spacer(),
@@ -155,7 +152,6 @@ class _MyLibraryPageState extends State<MyLibraryPage> {
                                                     const EdgeInsets.symmetric(
                                                         horizontal: 10),
                                                 decoration: BoxDecoration(
-                                                  
                                                   color: Colors.black,
                                                   borderRadius:
                                                       BorderRadius.circular(20),
@@ -169,7 +165,10 @@ class _MyLibraryPageState extends State<MyLibraryPage> {
                                                     "Explore",
                                                     style: TextStyle(
                                                         color: Color.fromARGB(
-                                                            255, 255, 255, 255)),
+                                                            255,
+                                                            255,
+                                                            255,
+                                                            255)),
                                                   ),
                                                   onPressed: () {
                                                     (dataListBook[index]
@@ -195,11 +194,12 @@ class _MyLibraryPageState extends State<MyLibraryPage> {
                                                     "Detail",
                                                     style: TextStyle(
                                                         color: Color.fromARGB(
-                                                            255, 255, 255, 255)),
+                                                            255,
+                                                            255,
+                                                            255,
+                                                            255)),
                                                   ),
-                                                  onPressed: () {
-                                                   
-                                                  },
+                                                  onPressed: () {},
                                                 ),
                                               ),
                                             ],
