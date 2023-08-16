@@ -4,92 +4,75 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_task1/bookfolder/book_list.dart';
 import 'package:flutter_application_task1/loginService/sign_up.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:uuid/uuid.dart';
 import '../model/current_user.dart';
 import '../model/user.dart';
 
 class LoginPage extends StatefulWidget {
-
-  LoginPage({ super.key});
+  LoginPage({super.key});
 
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
-    bool newuser =false;
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-    final TextEditingController emailController = TextEditingController();
-
+  final TextEditingController emailController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
   List<User> lsitData = [];
-
-  // Check if a user exists based on their username
-  bool doesUserExist(String username, List<User> userList,) {
-    return userList.any((user) => user.userName == username );
-  }
-
-
-  // Sign user in method
   void signInUser() async {
-   if (_formKey.currentState!.validate()) {
-     _formKey.currentState!.save();
-    String username = usernameController.text;
-    String password = passwordController.text;
-    
-     User? Cuser;
-    for (var user in lsitData) {
-      if (user.userName == username && user.password == password) {
-        Cuser = user;
-        break;
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+      String username = usernameController.text;
+      String password = passwordController.text;
+      User? currentUser;
+      for (var user in lsitData) {
+        if (user.userName == username && user.password == password) {
+          currentUser = user;
+          break;
+        }
+      }
+      if (currentUser != null) {
+        CurrentUser().signUpCurrent(currentUser.userId!);
+        loadData();
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => MyBook(
+              currentUserId: currentUser!.userId,
+            ),
+          ),
+        );
+      } else {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('User not found'),
+            content: const Text('Please sign up before signing in.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
       }
     }
-     if (Cuser != null) {
-      // Login successful
-      
-      CurrentUser().signUpCurrent(Cuser.userId!);
-      loadData();
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => MyBook(CurrentUserID: Cuser!.userId, ),
-        ),
-      );
-      } else {
-      // Show a dialog if user does not exist
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text('User not found'),
-          content: Text('Please sign up before signing in.'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text('OK'),
-            ),
-          ],
-        ),
-      );
-    }
   }
-}
- Future<void> loadData() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  String jsonUsers = prefs.getString('user') ?? '[]';
-  List<dynamic> userData = jsonDecode(jsonUsers);
-  lsitData = userData.map((user) => User.fromJson(user)).toList();
-}
- @override
-void initState() {
-  loadData().then((_) {
-    setState(() {
-      newuser = true; // Set newuser to true after data is loaded
-    });
-  });
-  super.initState();
-}
+
+  Future<void> loadData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String jsonUsers = prefs.getString('user') ?? '';
+    List<dynamic> userData = jsonDecode(jsonUsers);
+    lsitData = userData.map((user) => User.fromJson(user)).toList();
+  }
+
+  @override
+  void initState() {
+    loadData();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -119,7 +102,7 @@ void initState() {
                     children: [
                       TextFormField(
                         validator: (value) {
-                          if (value!.isEmpty ) {
+                          if (value!.isEmpty) {
                             return 'Please enter a username';
                           } else {
                             return null;
@@ -235,8 +218,8 @@ void initState() {
                   // google button
                   Container(
                     alignment: Alignment.center,
-                    padding: EdgeInsets.all(20),
-                    margin: EdgeInsets.only(left: 30),
+                    padding: const EdgeInsets.all(20),
+                    margin: const EdgeInsets.only(left: 30),
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.white),
                       borderRadius: BorderRadius.circular(16),
@@ -248,7 +231,7 @@ void initState() {
                     ),
                   ),
 
-                  SizedBox(width: 25),
+                  const SizedBox(width: 25),
 
                   // apple button
                 ],
@@ -269,7 +252,8 @@ void initState() {
                     onPressed: () {
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (context) => SignUpPage()),
+                        MaterialPageRoute(
+                            builder: (context) => const SignUpPage()),
                       );
                     },
                     child: const Text(

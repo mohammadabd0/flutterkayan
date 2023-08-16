@@ -1,15 +1,12 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
 import '../model/user.dart';
 
+// ignore: must_be_immutable
 class MyProfilePage extends StatefulWidget {
   String? username;
   String? email;
-  final String? CurrentUserID;
-  MyProfilePage({this.CurrentUserID, this.username, this.email, super.key});
+  final String? currentUserId;
+  MyProfilePage({this.currentUserId, this.username, this.email, super.key});
 
   @override
   State<MyProfilePage> createState() => _MyProfilePageState();
@@ -17,35 +14,9 @@ class MyProfilePage extends StatefulWidget {
 
 class _MyProfilePageState extends State<MyProfilePage> {
   List<User>? userList;
-  @override
-  void initState() {
-    //loadUserData();
-    super.initState();
-  }
-
-  void loadUserData() async {
-    if (widget.CurrentUserID != null) {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String jsonUsers = prefs.getString('user') ?? '[]';
-      List<dynamic> userData = jsonDecode(jsonUsers);
-      userList = userData.map((user) => User.fromJson(user)).toList();
-
-      User? currentUser =
-          userList!.firstWhere((user) => user.userId == widget.CurrentUserID);
-
-      if (currentUser != null) {
-        setState(() {
-          widget.username = currentUser.userName;
-          widget.email = currentUser.email;
-        });
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
-    loadUserData();
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black,

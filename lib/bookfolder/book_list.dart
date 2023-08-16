@@ -1,8 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_application_task1/bookfolder/addbook.dart';
 import 'package:flutter_application_task1/bookfolder/detail_page.dart';
@@ -12,17 +9,15 @@ import 'package:flutter_application_task1/drawerFolder/settengs.dart';
 import 'package:flutter_application_task1/loginService/sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../model/book.dart';
-
 import '../model/current_user.dart';
 import '../model/user.dart';
-
 enum SortOption { nameBook, nameAuthor, dateTime }
-
+// ignore: must_be_immutable
 class MyBook extends StatefulWidget {
-  final String? CurrentUserID;
+  final String? currentUserId;
   String? userName;
   String? email;
-  MyBook({this.CurrentUserID, this.email, this.userName, super.key});
+  MyBook({this.currentUserId, this.email, this.userName, super.key});
 
   @override
   State<MyBook> createState() => _MyBookState();
@@ -41,7 +36,7 @@ class _MyBookState extends State<MyBook> {
   List<User>? userList;
   @override
   void initState() {
-    Timer(Duration(seconds: 2), () {
+    Timer(const Duration(seconds: 2), () {
       setState(() {
         booklist;
         isLoading = false;
@@ -53,15 +48,16 @@ class _MyBookState extends State<MyBook> {
   }
 
   void loadUserData() async {
-    if (widget.CurrentUserID != null) {
+    if (widget.currentUserId != null) {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String jsonUsers = prefs.getString('user') ?? '[]';
       List<dynamic> userData = jsonDecode(jsonUsers);
       userList = userData.map((user) => User.fromJson(user)).toList();
 
       User? currentUser =
-          userList!.firstWhere((user) => user.userId == widget.CurrentUserID);
+          userList!.firstWhere((user) => user.userId == widget.currentUserId);
 
+      // ignore: unnecessary_null_comparison
       if (currentUser != null) {
         setState(() {
           widget.userName = currentUser.userName;
@@ -109,10 +105,10 @@ class _MyBookState extends State<MyBook> {
         "Book shope",
         style: TextStyle(color: Colors.white),
       ),
-      iconTheme: IconThemeData(color: Colors.white),
+      iconTheme: const IconThemeData(color: Colors.white),
       actions: [
         PopupMenuButton<SortOption>(
-          icon: Icon(Icons.sort, color: Colors.white),
+          icon: const Icon(Icons.sort, color: Colors.white),
           onSelected: (value) {
             setState(() {
               selectedSortOption = value;
@@ -164,7 +160,7 @@ class _MyBookState extends State<MyBook> {
             child: ListView(
               children: [
                 ListTile(
-                  title: Text('My Profile '),
+                  title: const Text('My Profile '),
                   onTap: () {
                     Navigator.push(
                       context,
@@ -177,30 +173,30 @@ class _MyBookState extends State<MyBook> {
                   },
                 ),
                 ListTile(
-                  title: Text('My Library'),
+                  title: const Text('My Library'),
                   onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => MyLibraryPage(),
+                        builder: (context) => const MyLibraryPage(),
                       ),
                     );
                   },
                 ),
                 ListTile(
-                  title: Text('Settings'),
+                  title: const Text('Settings'),
                   onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => MySettingsPage(),
+                        builder: (context) => const MySettingsPage(),
                       ),
                     );
                   },
                 ),
-                Divider(height: 10),
+                const Divider(height: 10),
                 ListTile(
-                  title: Text('Logout'),
+                  title: const Text('Logout'),
                   onTap: () {
                     CurrentUser currentUser = CurrentUser();
                     currentUser.logout();
@@ -234,10 +230,8 @@ class _MyBookState extends State<MyBook> {
                       color: Colors.white,
                       elevation: 0,
                       shadowColor: Colors.black,
-                    
                       shape: RoundedRectangleBorder(
-                      
-                        side: BorderSide(color: Colors.black),
+                        side: const BorderSide(color: Colors.black),
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Column(
@@ -330,9 +324,9 @@ class _MyBookState extends State<MyBook> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.secondary,
-        title: Text("Book List"),
+        title: const Text("Book List"),
       ),
-      body: Center(
+      body: const Center(
         child: CircularProgressIndicator(),
       ),
     );
@@ -376,12 +370,6 @@ class _MyBookState extends State<MyBook> {
                       saveBook();
                       Navigator.pop(context);
                       Navigator.pop(context);
-
-                      /* Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => MyBook(),
-                          )); */ // Save the updated book list after deletion
                     },
                     child: const Text("Yes"),
                   ),
