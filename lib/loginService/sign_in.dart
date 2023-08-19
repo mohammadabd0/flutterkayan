@@ -1,11 +1,7 @@
-import 'dart:convert';
-
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_task1/bookfolder/book_list.dart';
 import 'package:flutter_application_task1/loginService/sign_up.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../model/current_user.dart';
-import '../model/user.dart';
 
 class LoginPage extends StatefulWidget {
   LoginPage({super.key});
@@ -19,60 +15,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  List<User> lsitData = [];
-  void signInUser() async {
-    if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
-      String username = usernameController.text;
-      String password = passwordController.text;
-      User? currentUser;
-      for (var user in lsitData) {
-        if (user.userName == username && user.password == password) {
-          currentUser = user;
-          break;
-        }
-      }
-      if (currentUser != null) {
-        CurrentUser().signUpCurrent(currentUser.userId!);
-        loadData();
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => MyBook(
-              currentUserId: currentUser!.userId,
-            ),
-          ),
-        );
-      } else {
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('User not found'),
-            content: const Text('Please sign up before signing in.'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text('OK'),
-              ),
-            ],
-          ),
-        );
-      }
-    }
-  }
 
-  Future<void> loadData() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String jsonUsers = prefs.getString('user') ?? '';
-    List<dynamic> userData = jsonDecode(jsonUsers);
-    lsitData = userData.map((user) => User.fromJson(user)).toList();
-  }
-
-  @override
-  void initState() {
-    loadData();
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -103,12 +46,12 @@ class _LoginPageState extends State<LoginPage> {
                       TextFormField(
                         validator: (value) {
                           if (value!.isEmpty) {
-                            return 'Please enter a username';
+                            return 'Please enter a email';
                           } else {
                             return null;
                           }
                         },
-                        controller: usernameController,
+                        controller: emailController,
                         obscureText: false,
                         decoration: InputDecoration(
                           enabledBorder: const OutlineInputBorder(
@@ -119,7 +62,7 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           fillColor: Colors.grey.shade200,
                           filled: true,
-                          hintText: 'Username',
+                          hintText: 'email',
                           hintStyle: TextStyle(color: Colors.grey[500]),
                         ),
                       ),
@@ -157,8 +100,19 @@ class _LoginPageState extends State<LoginPage> {
 
               // sign in button
               GestureDetector(
-                onTap: () {
-                  signInUser();
+                onTap: () async {
+                  if (_formKey.currentState!.validate()) {
+                    
+                    await FirebaseAuth.instance.signInWithEmailAndPassword(
+                        email: emailController.text,
+                        password: passwordController.text);
+                    // ignore: use_build_context_synchronously
+                    Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => MyBook(),
+                        ));
+                  }
                 },
                 child: Container(
                   padding: const EdgeInsets.all(25),
@@ -232,14 +186,9 @@ class _LoginPageState extends State<LoginPage> {
                   ),
 
                   const SizedBox(width: 25),
-
-                  // apple button
                 ],
               ),
-
               const SizedBox(height: 50),
-
-              // not a member? register now
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [

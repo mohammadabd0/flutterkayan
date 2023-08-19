@@ -1,10 +1,7 @@
-import 'dart:convert';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_task1/bookfolder/book_list.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:uuid/uuid.dart';
-import '../model/current_user.dart';
-import '../model/user.dart';
+import 'package:flutter_application_task1/loginService/sign_in.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -19,79 +16,9 @@ class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
   bool _isValid = false;
   bool _isEmailValid = false;
-  Future<void> saveData(User signUp) async {
-    List<User> users = await loadUserList();
-    users.add(signUp);
-    final data = users.map((user) => user.toJson()).toList();
-    final jsonDataUser = json.encode(data);
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('user', jsonDataUser);
-  }
-
-  Future<List<User>> loadUserList() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String jsonUsers = prefs.getString('user') ?? '[]';
-    List<dynamic> userData = jsonDecode(jsonUsers);
-    List<User> users = userData.map((user) => User.fromJson(user)).toList();
-    return users;
-  }
-
-  Future<bool> doesUserExist(String username) async {
-    List<User> userList = await loadUserList();
-    return userList.any((user) => user.userName == username);
-  }
-
-  void saveUser() async {
-    if (_formKey.currentState!.validate()) {
-      String newUsername = usernameController.text;
-      bool usernameExists = await doesUserExist(newUsername);
-      if (usernameExists) {
-        // ignore: use_build_context_synchronously
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('Username already exists'),
-            content: const Text('Please choose a different username.'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text('OK'),
-              ),
-            ],
-          ),
-        );
-        return;
-      }
-      String userId = const Uuid().v4();
-      User newUser = User(
-        userId: userId,
-        userName: newUsername,
-        email: emailController.text,
-        password: passwordController.text,
-      );
-      await saveData(newUser);
-      CurrentUser currentUser = CurrentUser();
-      currentUser.signUpCurrent(userId);
-      // ignore: use_build_context_synchronously
-      await Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-            builder: (context) => MyBook(
-                  currentUserId: userId,
-                  email: emailController.text,
-                  userName: newUsername,
-                )),
-      );
-    }
-  }
-
-  @override
-  void initState() {
-    loadUserList();
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -306,8 +233,17 @@ class _SignUpPageState extends State<SignUpPage> {
 
               GestureDetector(
                 child: TextButton(
-                  onPressed: () {
-                    saveUser();
+                  onPressed: () async {
+                    if(_formKey.currentState!.validate()){
+                      _formKey.currentState!.save();
+                      try {
+                     await FirebaseAuth.instance.createUserWithEmailAndPassword(email:emailController.text , password: passwordController.text);
+                        // ignore: use_build_context_synchronously
+                        Navigator.pushReplacement(context ,MaterialPageRoute(builder: (context) => MyBook(),));
+                      } catch (e) {
+                        print(e.toString());
+                      }
+                    }
                   },
                   child: Container(
                     padding: const EdgeInsets.all(25),
@@ -349,8 +285,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
               const SizedBox(height: 50),
 
-              // not a member? register now
-              /*   Row(
+                 Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
@@ -360,19 +295,14 @@ class _SignUpPageState extends State<SignUpPage> {
                   const SizedBox(width: 4),
                   TextButton(
                     onPressed: () async {
-                      var updatedUserList = await Navigator.pushReplacement(
+                  await Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
                             builder: (context) =>
                                 LoginPage()),
                       );
 
-                      // Update the userList with the result from LoginPage
-                      if (updatedUserList != null) {
-                        setState(() {
-                          userList = updatedUserList;
-                        });
-                      }
+                    
                     },
                     child: const Text(
                       'login',
@@ -383,7 +313,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                   )
                 ],
-              )*/
+              )
             ],
           ),
         ),

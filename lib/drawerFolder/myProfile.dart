@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../model/user.dart';
 
 // ignore: must_be_immutable
 class MyProfilePage extends StatefulWidget {
@@ -13,7 +12,6 @@ class MyProfilePage extends StatefulWidget {
 }
 
 class _MyProfilePageState extends State<MyProfilePage> {
-  List<User>? userList;
 
   @override
   Widget build(BuildContext context) {
@@ -44,13 +42,13 @@ class _MyProfilePageState extends State<MyProfilePage> {
             ),
             const SizedBox(height: 50.0),
             Text(
-              'Username: ${widget.username}',
+              'Username: ',
               style:
                   const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20.0),
             Text(
-              'Email: ${widget.email}',
+              'Email:',
               style:
                   const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
             ),

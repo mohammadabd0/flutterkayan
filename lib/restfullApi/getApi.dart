@@ -4,10 +4,7 @@ import 'package:http/http.dart' as http;
 
 Future<List<Book>> fetchData(List<String> query) async {
   const apiKey = "AIzaSyCWswrn9-1ublWXhRtwFAzlWg1be1jMd78";
-  final apiUrl =
-      "https://www.googleapis.com/books/v1/volumes?q=$query&key=$apiKey";
-  /*const apiKey = "AIzaSyCWswrn9-1ublWXhRtwFAzlWg1be1jMd78";
-  final apiUrl = "https://www.googleapis.com/books/v1/volumes?q=$query&key=$apiKey";*/
+  final apiUrl = "https://www.googleapis.com/books/v1/volumes?q=$query&key=$apiKey";
   try {
     final response = await http.get(Uri.parse(apiUrl));
 
@@ -64,4 +61,35 @@ Future<List<Book>> fetchData(List<String> query) async {
     print("An error occurred: $e");
     throw Exception("Failed to fetch data");
   }
+
+
+
+  
 }
+
+  //POST
+  
+  Future<void> sendDataToApi(Book book) async {
+  const apiKey = "AIzaSyCWswrn9-1ublWXhRtwFAzlWg1be1jMd78"; 
+  final apiUrl = "https://www.googleapis.com/books/v1/mylibrary/bookshelves/shelf/addVolume?key=$apiKey"; 
+
+  try {
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $apiKey',
+      },
+      body: json.encode(book.toJson()), 
+    );
+
+    if (response.statusCode == 200) {
+      print("Data sent successfully!");
+    } else {
+      print("Failed to send data. Status code: ${response.statusCode}");
+    }
+  } catch (e) {
+    print("An error occurred: $e");
+  }
+}
+ 

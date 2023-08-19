@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_task1/bookfolder/addbook.dart';
 import 'package:flutter_application_task1/bookfolder/detail_page.dart';
@@ -9,31 +10,21 @@ import 'package:flutter_application_task1/drawerFolder/settengs.dart';
 import 'package:flutter_application_task1/loginService/sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../model/book.dart';
-import '../model/current_user.dart';
-import '../model/user.dart';
 enum SortOption { nameBook, nameAuthor, dateTime }
 // ignore: must_be_immutable
 class MyBook extends StatefulWidget {
-  final String? currentUserId;
-  String? userName;
-  String? email;
-  MyBook({this.currentUserId, this.email, this.userName, super.key});
+  MyBook({ super.key});
 
   @override
   State<MyBook> createState() => _MyBookState();
 }
 
 class _MyBookState extends State<MyBook> {
-  final List<String> bookImages = [
-    'assets/images/icon-book.png',
-    'assets/images/PNG2105.png',
-    'assets/images/pngimg.png',
-  ];
+ 
   bool isSearchVisible = false;
   late List<Book> booklist = [];
   bool isLoading = true;
   SortOption selectedSortOption = SortOption.dateTime;
-  List<User>? userList;
   @override
   void initState() {
     Timer(const Duration(seconds: 2), () {
@@ -42,37 +33,11 @@ class _MyBookState extends State<MyBook> {
         isLoading = false;
       });
     });
-    loadUserData();
     loadbook(); // Load the saved books
     super.initState();
   }
 
-  void loadUserData() async {
-    if (widget.currentUserId != null) {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String jsonUsers = prefs.getString('user') ?? '[]';
-      List<dynamic> userData = jsonDecode(jsonUsers);
-      userList = userData.map((user) => User.fromJson(user)).toList();
 
-      User? currentUser =
-          userList!.firstWhere((user) => user.userId == widget.currentUserId);
-
-      // ignore: unnecessary_null_comparison
-      if (currentUser != null) {
-        setState(() {
-          widget.userName = currentUser.userName;
-          widget.email = currentUser.email;
-          isLoading = false;
-        });
-      }
-    }
-  }
-
-  void saveUs() async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    String jsonuser = jsonEncode(userList);
-    preferences.setString("user", jsonuser);
-  }
 
   void loadbook() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
@@ -93,7 +58,6 @@ class _MyBookState extends State<MyBook> {
 
   @override
   Widget build(BuildContext context) {
-    loadUserData();
 
     return isLoading ? loadingPage() : buildList();
   }
@@ -118,7 +82,7 @@ class _MyBookState extends State<MyBook> {
           itemBuilder: (context) => [
             const PopupMenuItem(
               value: SortOption.nameBook,
-              child: Text('Sort by Name Book'),
+              child: Text('Sort by Name Book'), 
             ),
             const PopupMenuItem(
               value: SortOption.nameAuthor,
@@ -166,8 +130,8 @@ class _MyBookState extends State<MyBook> {
                       context,
                       MaterialPageRoute(
                           builder: (context) => MyProfilePage(
-                                email: widget.email,
-                                username: widget.userName,
+                                email: "",
+                                username:"",
                               )),
                     );
                   },
@@ -197,15 +161,9 @@ class _MyBookState extends State<MyBook> {
                 const Divider(height: 10),
                 ListTile(
                   title: const Text('Logout'),
-                  onTap: () {
-                    CurrentUser currentUser = CurrentUser();
-                    currentUser.logout();
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => LoginPage(),
-                      ),
-                    );
+                  onTap: ()async {
+                   await FirebaseAuth.instance.signOut();
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginPage()));
                   },
                 ),
               ],
@@ -290,8 +248,6 @@ class _MyBookState extends State<MyBook> {
             color: Colors.white,
           ),
           onPressed: () async {
-            //var randomImageIndex = Random().nextInt(bookImages.length);
-
             Book newbook = Book(
                 author: " ",
                 dateTime: DateTime.now(),
@@ -312,7 +268,6 @@ class _MyBookState extends State<MyBook> {
                 booklist.add(result as Book);
               });
               saveBook();
-              loadUserData();
             }
           },
         ),
@@ -365,7 +320,6 @@ class _MyBookState extends State<MyBook> {
                       setState(() {
                         booklist.removeAt(index);
                       });
-                      loadUserData();
 
                       saveBook();
                       Navigator.pop(context);
@@ -402,7 +356,6 @@ class _MyBookState extends State<MyBook> {
         booklist[index] = editedBook;
       });
       saveBook();
-      loadUserData();
     }
   }
 }

@@ -38,6 +38,11 @@ class _AddBooksState extends State<AddBooks> {
         Book(nameBook: "", author: "", dateTime: DateTime.now(), image: "");
     _nameController.text = newbook.getnameBook;
     _authorController.text = newbook.getauthor;
+    fetchData([categories.first]).then((dataList) {
+      setState(() {
+        dataListBook = dataList;
+      });
+    });
     super.initState();
   }
 
