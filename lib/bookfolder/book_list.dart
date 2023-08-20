@@ -163,6 +163,7 @@ class _MyBookState extends State<MyBook> {
                   title: const Text('Logout'),
                   onTap: ()async {
                    await FirebaseAuth.instance.signOut();
+    // ignore: use_build_context_synchronously
     Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginPage()));
                   },
                 ),

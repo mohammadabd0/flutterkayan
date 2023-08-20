@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
@@ -42,7 +43,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
             ),
             const SizedBox(height: 50.0),
             Text(
-              'Username: ',
+              'Username: ${FirebaseAuth.instance.currentUser!}',
               style:
                   const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
             ),

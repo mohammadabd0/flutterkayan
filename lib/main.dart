@@ -17,6 +17,7 @@ void main() async {
   );
 
   sendDataToApi(book);
+  print(sendDataToApi(book));
   runApp(const MyApp());
 
 }
