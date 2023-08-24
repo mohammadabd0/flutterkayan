@@ -11,14 +11,14 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   Book book = Book(
-    nameBook: "The Hitchhiker's Guide to the Galaxy",
+    nameBook: "Guide to the Galaxy",
     author: "Douglas Adams",
    
   );
 
-  sendDataToApi(book);
-  print(sendDataToApi(book));
   runApp(const MyApp());
+  sendDataToApi(book);
+  print("sssssss ${book}");
 
 }
 

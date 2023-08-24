@@ -59,8 +59,8 @@ class Book {
 
   Map<String, dynamic> toJson() {
     return {
-      "bookName": _nameBook,
-      "author": _author,
+      "title": _nameBook,
+      "authors": _author,
       "dateTime": _dateTime?.toIso8601String(),
       "image": _image,
       "infolink": _infolink
@@ -69,8 +69,8 @@ class Book {
 
   factory Book.fromJson(Map<String, dynamic> json) {
     return Book(
-        nameBook: json["bookName"],
-        author: json["author"],
+        nameBook: json["title"],
+        author: json["authors"],
         dateTime: DateTime.parse(json["dateTime"]),
         image: json["image"],
         infolink: json["infolink"]);

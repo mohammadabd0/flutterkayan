@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_task1/bookfolder/book_list.dart';
 import 'package:flutter_application_task1/loginService/sign_in.dart';
+import 'package:flutter_application_task1/restfullApi/api.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -126,8 +127,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           fontSize: 12,
                         ),
                       ),
-                      const SizedBox(height: 10),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 20),
                       TextFormField(
                         controller: passwordController,
                         obscureText: true,
@@ -234,12 +234,22 @@ class _SignUpPageState extends State<SignUpPage> {
               GestureDetector(
                 child: TextButton(
                   onPressed: () async {
-                    if(_formKey.currentState!.validate()){
+                    if (_formKey.currentState!.validate()) {
                       _formKey.currentState!.save();
                       try {
-                     await FirebaseAuth.instance.createUserWithEmailAndPassword(email:emailController.text , password: passwordController.text);
+                        await FirebaseAuth.instance
+                            .createUserWithEmailAndPassword(
+                          email: emailController.text,
+                          password: passwordController.text,
+                        );
+
+
                         // ignore: use_build_context_synchronously
-                        Navigator.pushReplacement(context ,MaterialPageRoute(builder: (context) => MyBook(),));
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => MyBook(),
+                            ));
                       } catch (e) {
                         print(e.toString());
                       }
@@ -285,7 +295,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
               const SizedBox(height: 50),
 
-                 Row(
+              Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
@@ -295,14 +305,10 @@ class _SignUpPageState extends State<SignUpPage> {
                   const SizedBox(width: 4),
                   TextButton(
                     onPressed: () async {
-                  await Navigator.pushReplacement(
+                      await Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                LoginPage()),
+                        MaterialPageRoute(builder: (context) => LoginPage()),
                       );
-
-                    
                     },
                     child: const Text(
                       'login',

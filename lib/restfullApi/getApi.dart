@@ -3,7 +3,7 @@ import 'package:flutter_application_task1/model/book.dart';
 import 'package:http/http.dart' as http;
 
 Future<List<Book>> fetchData(List<String> query) async {
-  const apiKey = "AIzaSyCWswrn9-1ublWXhRtwFAzlWg1be1jMd78";
+  const apiKey = "AIzaSyC8nwtWG9btNsuFQ9-a7GjIgWI7RBIc8ug";
   final apiUrl =
       "https://www.googleapis.com/books/v1/volumes?q=$query&key=$apiKey";
   try {
@@ -67,18 +67,19 @@ Future<List<Book>> fetchData(List<String> query) async {
 //POST
 
 Future<void> sendDataToApi(Book book) async {
-  const apiKey = "AIzaSyCWswrn9-1ublWXhRtwFAzlWg1be1jMd78";
-  final apiUrl =
-      "https://www.googleapis.com/books/v1/mylibrary/bookshelves/shelf/addVolume?key=$apiKey";
+  const apiKey = "387986060762-65vattrbo6up0dgj9418k42pmclpiai3.apps.googleusercontent.com";
+  const apiUrl = "https://www.googleapis.com/books/v1/mylibrary/bookshelves/shelf/addVolume?key=$apiKey";
+
+  final accessToken = "387986060762-65vattrbo6up0dgj9418k42pmclpiai3";
 
   try {
     final response = await http.post(
       Uri.parse(apiUrl),
       headers: {
-        'Content-Type': 'application/json', // Set content-type as JSON
-        'Authorization': 'Bearer $apiKey',
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
       },
-      body: json.encode(book.toJson()), // JSON-encoded data
+      body: json.encode(book.toJson()),
     );
 
     print("${response.statusCode}");
